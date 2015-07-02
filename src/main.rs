@@ -12,7 +12,7 @@ static USAGE: &'static str = "
 ktee - tee for Kafka.
 
 Usage:
-    ktee -b BROKER -t TOPIC
+    ktee [-b BROKER] -t TOPIC
     ktee (-h | --help)
 
 Options:
