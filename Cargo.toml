@@ -1,0 +1,10 @@
+[package]
+name = "ktee"
+version = "0.1.0"
+authors = ["Xavier Stevens <xavier@simple.com>"]
+build = "build.rs"
+
+[dependencies]
+rustc-serialize = "*"
+docopt = "*"
+kafka = "*"
