@@ -34,11 +34,8 @@ fn main() {
 
     let mut client = KafkaClient::new(vec!(args.flag_broker));
     let meta_res = client.load_metadata_all();
-    if meta_res.is_err() {
-        match meta_res.err() {
-            Some(err) => println!("Error: {}", err),
-            None => println!("Non-specific error")
-        }
+    if let Some(err) = meta_res.err() {
+        println!("Error fetching metadata: {}", err);
         return;
     }
 
@@ -50,11 +47,8 @@ fn main() {
             args.flag_topic.to_string(), // Topic
             line.unwrap().into_bytes()   // Message
         );
-        if res.is_err() {
-            match res.err() {
-                Some(err) => println!("{}", err),
-                None => println!("Non-specific error")
-            }
+        if let Some(err) = res.err() {
+            println!("Error sending message: {}", err);
         }
     }
 }
