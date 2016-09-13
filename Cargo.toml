@@ -5,6 +5,5 @@ authors = ["Xavier Stevens <xavier@mystobreak.com>"]
 build = "build.rs"
 
 [dependencies]
-rustc-serialize = "*"
-docopt = "*"
-kafka = "*"
+clap = "*"
+kafka = { git="https://github.com/spicavigo/kafka-rust" }

@@ -1,38 +1,37 @@
-extern crate docopt;
-extern crate rustc_serialize;
+extern crate clap;
 extern crate kafka;
 
-use docopt::Docopt;
-use kafka::client::KafkaClient;
+use clap::{Arg, App};
+use kafka::client::{KafkaClient, ProduceMessage, RequiredAcks};
+use std::time::Duration;
 use std::io;
 use std::io::prelude::*;
 
-// usage string
-static USAGE: &'static str = "
-ktee - tee for Kafka.
-
-Usage:
-    ktee [-b BROKER] -t TOPIC
-    ktee (-h | --help)
-
-Options:
-    -h, --help                  Show this message.
-    -b BROKER, --broker=BROKER  Kafka broker [default: localhost:9092].
-    -t TOPIC, --topic=TOPIC     Kafka topic.
-";
-
-#[derive(RustcDecodable, Debug)]
-struct Args {
-    flag_broker: String,
-    flag_topic: String,
-}
-
 fn main() {
-    let args: Args = Docopt::new(USAGE)
-                            .and_then(|d| d.decode())
-                            .unwrap_or_else(|e| e.exit());
+    let matches = App::new("ktee")
+                      .version("0.1.0")
+                      .author("Xavier Stevens <xavier@mystobreak.com>")
+                      .about("tee for Kafka")
+                      .arg(Arg::with_name("broker")
+                               .short("b")
+                               .long("broker")
+                               .value_name("BROKER")
+                               .help("Kafka broker")
+                               .takes_value(true)
+                               .required(true))
+                      .arg(Arg::with_name("topic")
+                               .short("t")
+                               .long("topic")
+                               .value_name("TOPIC")
+                               .help("Kafka topic")
+                               .takes_value(true)
+                               .required(true))
+                      .get_matches();
 
-    let mut client = KafkaClient::new(vec!(args.flag_broker));
+    let broker = matches.value_of("broker").unwrap();
+    let topic = matches.value_of("topic").unwrap();
+
+    let mut client = KafkaClient::new(vec![broker.to_owned()]);
     let meta_res = client.load_metadata_all();
     if let Some(err) = meta_res.err() {
         println!("Error fetching metadata: {}", err);
@@ -41,14 +40,13 @@ fn main() {
 
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
-        let res = client.send_message(
-            1,                           // Required Acks
-            0,                           // Timeout
-            args.flag_topic.to_string(), // Topic
-            line.unwrap().into_bytes()   // Message
-        );
-        if let Some(err) = res.err() {
-            println!("Error sending message: {}", err);
+        if line.is_ok() {
+            let b = line.unwrap().into_bytes();
+            let req = vec![ProduceMessage::new(topic, 0, None, Some(&b))];
+            let res = client.produce_messages(RequiredAcks::One, Duration::from_millis(0), req);
+            if let Some(err) = res.err() {
+                println!("Error sending message: {}", err);
+            }
         }
     }
 }
