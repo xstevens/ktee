@@ -20,7 +20,7 @@ cargo build
 ```
 
 ### Cross-compiling
-COMING SOON!
+Use Rustup. [https://blog.rust-lang.org/2016/05/13/rustup.html](https://blog.rust-lang.org/2016/05/13/rustup.html)
 
 ## Usage
 ```

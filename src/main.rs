@@ -10,7 +10,7 @@ use std::io::prelude::*;
 fn main() {
     let args = App::new("ktee")
                    .version("0.1.0")
-                   .about("tee for kafka")
+                   .about("tee for Apache Kafka")
                    .arg(Arg::with_name("broker")
                             .short("b")
                             .long("broker")
