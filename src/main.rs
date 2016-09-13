@@ -38,21 +38,21 @@ fn main() {
     }
 
     let stdin = io::stdin();
-    let mut stdout = io::stdout();
-    let mut stderr = io::stderr();
     for line in stdin.lock().lines() {
-        if line.is_ok() {
-            let l = line.unwrap();
-            let req = vec![ProduceMessage::new(topic, 0, None, Some(&l.as_bytes()))];
-            let res = client.produce_messages(RequiredAcks::One, Duration::from_millis(0), req);
-            if let Some(err) = res.err() {
-                writeln!(&mut stderr, "Error sending message: {}", err).unwrap();
-            }
+        match line {
+            Ok(line) => {
+                let req = vec![ProduceMessage::new(topic, 0, None, Some(&line.as_bytes()))];
+                let res = client.produce_messages(RequiredAcks::One, Duration::from_millis(0), req);
+                if let Some(err) = res.err() {
+                    writeln!(&mut io::stderr(), "Error sending message: {}", err).unwrap();
+                }
 
-            let write_res = write!(&mut stdout, "{}\n", &l);
-            if let Some(err) = write_res.err() {
-                writeln!(&mut stderr, "Error writing to stdout: {}", err).unwrap();
+                let write_res = write!(&mut io::stdout(), "{}\n", &line);
+                if let Some(err) = write_res.err() {
+                    writeln!(&mut io::stderr(), "Error writing to stdout: {}", err).unwrap();
+                }
             }
+            Err(err) => writeln!(&mut io::stderr(), "Error reading from stdin: {}", err).unwrap(),
         }
     }
 }
