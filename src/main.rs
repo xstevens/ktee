@@ -8,27 +8,26 @@ use std::io;
 use std::io::prelude::*;
 
 fn main() {
-    let matches = App::new("ktee")
-                      .version("0.1.0")
-                      .about("tee for kafka")
-                      .arg(Arg::with_name("broker")
-                               .short("b")
-                               .long("broker")
-                               .value_name("BROKER")
-                               .help("Kafka broker")
-                               .takes_value(true)
-                               .required(true))
-                      .arg(Arg::with_name("topic")
-                               .short("t")
-                               .long("topic")
-                               .value_name("TOPIC")
-                               .help("Kafka topic")
-                               .takes_value(true)
-                               .required(true))
-                      .get_matches();
-
-    let broker = matches.value_of("broker").unwrap();
-    let topic = matches.value_of("topic").unwrap();
+    let args = App::new("ktee")
+                   .version("0.1.0")
+                   .about("tee for kafka")
+                   .arg(Arg::with_name("broker")
+                            .short("b")
+                            .long("broker")
+                            .value_name("BROKER")
+                            .help("Kafka broker")
+                            .takes_value(true)
+                            .required(true))
+                   .arg(Arg::with_name("topic")
+                            .short("t")
+                            .long("topic")
+                            .value_name("TOPIC")
+                            .help("Kafka topic")
+                            .takes_value(true)
+                            .required(true))
+                   .get_matches();
+    let broker = args.value_of("broker").unwrap();
+    let topic = args.value_of("topic").unwrap();
 
     let mut client = KafkaClient::new(vec![broker.to_owned()]);
     let meta_res = client.load_metadata_all();
