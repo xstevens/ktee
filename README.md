@@ -24,17 +24,20 @@ Use Rustup. [https://blog.rust-lang.org/2016/05/13/rustup.html](https://blog.rus
 
 ## Usage
 ```
-$ ./target/debug/ktee -h
-ktee - tee for Kafka.
+$ target/debug/ktee -h
+ktee 0.1.0
+tee for Apache Kafka
 
-Usage:
-    ktee [-b BROKER] -t TOPIC
-    ktee (-h | --help)
+USAGE:
+    ktee [OPTIONS] --topic <TOPIC>
 
-Options:
-    -h, --help                  Show this message.
-    -b BROKER, --broker=BROKER  Kafka broker [default: localhost:9092].
-    -t TOPIC, --topic=TOPIC     Kafka topic.
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -b, --broker <BROKER>    Kafka broker
+    -t, --topic <TOPIC>      Kafka topic
 ```
 
 ## License
