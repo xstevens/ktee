@@ -16,8 +16,7 @@ fn main() {
                             .long("broker")
                             .value_name("BROKER")
                             .help("Kafka broker")
-                            .takes_value(true)
-                            .required(true))
+                            .takes_value(true))
                    .arg(Arg::with_name("topic")
                             .short("t")
                             .long("topic")
@@ -26,7 +25,7 @@ fn main() {
                             .takes_value(true)
                             .required(true))
                    .get_matches();
-    let broker = args.value_of("broker").unwrap();
+    let broker = args.value_of("broker").unwrap_or("localhost:9092");
     let topic = args.value_of("topic").unwrap();
 
     let mut client = KafkaClient::new(vec![broker.to_owned()]);
