@@ -34,17 +34,19 @@ fn main() {
         println!("Error fetching metadata: {}", err);
         return;
     }
-
+    
     let stdin = io::stdin();
     for line in stdin.lock().lines() {
         match line {
             Ok(line) => {
+                // send line as a message to kafka
                 let req = vec![ProduceMessage::new(topic, 0, None, Some(&line.as_bytes()))];
                 let res = client.produce_messages(RequiredAcks::One, Duration::from_millis(0), req);
                 if let Some(err) = res.err() {
                     writeln!(&mut io::stderr(), "Error sending message: {}", err).unwrap();
                 }
-
+                
+                // write line to stdout
                 let write_res = write!(&mut io::stdout(), "{}\n", &line);
                 if let Some(err) = write_res.err() {
                     writeln!(&mut io::stderr(), "Error writing to stdout: {}", err).unwrap();
