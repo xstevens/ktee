@@ -5,18 +5,8 @@ Like *nix tee but pipes stdin to Apache Kafka
 * [Snappy compression library](https://github.com/google/snappy)
 
 ## Build
-On Mac OS X it seems that Rust doesn't have /usr/local/lib in its linker search path(s). In general its not recommended to put things like _/usr/local/lib_ which likely contain homebrew compiled libs in DYLD_LIBRARY_PATH. This is because they might conflict with Mac's native libs. So export DYLD_FALLBACK_LIBRARY_PATH instead like so:
-
 ```
-export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/lib
-```
-
-ktee's build script (build.rs) picks this up if available and adds it to the link search path(s).
-
-Assuming did everything above you should just be able to:
-
-```
-cargo build
+cargo build --release
 ```
 
 ### Cross-compiling
