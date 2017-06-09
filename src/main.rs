@@ -1,3 +1,4 @@
+#[macro_use]
 extern crate clap;
 extern crate kafka;
 
@@ -9,7 +10,7 @@ use std::io::prelude::*;
 
 fn main() {
     let args = App::new("ktee")
-                   .version("0.1.0")
+                   .version(crate_version!())
                    .about("tee for Apache Kafka")
                    .arg(Arg::with_name("broker")
                             .short("b")
@@ -29,14 +30,17 @@ fn main() {
     let topic = args.value_of("topic").unwrap();
 
     let mut client = KafkaClient::new(vec![broker.to_owned()]);
-    let meta_res = client.load_metadata_all();
+    let meta_res = client.load_metadata(&[topic]);
     if let Some(err) = meta_res.err() {
-        println!("Error fetching metadata: {}", err);
+        println!("Error fetching metadata for topic: {}", err);
         return;
     }
     
     let stdin = io::stdin();
-    for line in stdin.lock().lines() {
+    let stdout = io::stdout();
+    let reader = io::BufReader::new(stdin.lock());
+    let mut writer = io::BufWriter::new(stdout.lock());
+    for line in reader.lines() {
         match line {
             Ok(line) => {
                 // send line as a message to kafka
@@ -47,7 +51,7 @@ fn main() {
                 }
                 
                 // write line to stdout
-                let write_res = write!(&mut io::stdout(), "{}\n", &line);
+                let write_res = writeln!(&mut writer, "{}", &line);
                 if let Some(err) = write_res.err() {
                     writeln!(&mut io::stderr(), "Error writing to stdout: {}", err).unwrap();
                 }
